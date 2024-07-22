@@ -172,7 +172,7 @@ public class SearchQuery {
     private static List<String[]> data = new ArrayList<>(); // List to store data from the CSV file
     private static HashMap<String, Integer> searchCounts = new HashMap<>(); // HashMap to store search query counts
 
-    public static void main(String[] args) {
+    static {
         // Attempt to find and access the CSV file from the specified location
         try (CSVReader reader = new CSVReader(new FileReader("cars1.csv"))) {
             String[] nextLine;
@@ -186,7 +186,33 @@ public class SearchQuery {
         } catch (IOException | CsvValidationException e) {
             e.printStackTrace(); // Print stack trace if an IO exception occurs
         }
+    }
 
+    // Public method to get the search count for a given query
+    public static int getSearchCount(String query) {
+        query = query.toLowerCase().trim(); // Convert query to lower case and trim spaces
+        boolean found = false; // Flag to track if any matching data is found in the CSV file
+        // Iterate through each entry in the data list to find matches for the query
+        for (String[] entry : data) {
+            // Check if any cell in the current entry contains the search query (case-insensitive)
+            String finalQuery = query;
+            if (Arrays.stream(entry).anyMatch(s -> s.toLowerCase().contains(finalQuery))) {
+                found = true; // Set found flag to true if match is found
+                break; // Exit loop early since match is found
+            }
+        }
+
+        // If matching data is found, update the AVLTree and searchCounts
+        if (found) {
+            avlTree.insert(query); // Insert the search query into the AVLTree for frequency tracking
+            searchCounts.put(query, searchCounts.getOrDefault(query, 0) + 1); // Update search count for the query
+            return avlTree.findFrequency(query); // Return the frequency count of the search query
+        } else {
+            return 0; // Return 0 if no matching data is found
+        }
+    }
+
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in); // Scanner object to allow user input
         // Continuous loop to handle search queries until user chooses to exit
         while (true) {
@@ -195,43 +221,27 @@ public class SearchQuery {
             if (query.equalsIgnoreCase("exit")) {
                 break; // Exit loop if user enters "exit"
             }
+            if(!query.isEmpty()) {
+                int frequency = getSearchCount(query); // Get search count for the query
+                if (frequency > 0) {
+                    // Print separator line and display search term and its frequency
+                    System.out.println("-----------------------------");
+                    System.out.println("Search Term: " + query); // Display the search term entered by the user
+                    System.out.println("Count: " + frequency); // Display the frequency count of the search term
+                    System.out.println("-----------------------------");
 
-            boolean found = false; // Flag to track if any matching data is found in the CSV file
-            // Iterate through each entry in the data list to find matches for the query
-            for (String[] entry : data) {
-                // Check if any cell in the current entry contains the search query (case-insensitive)
-                if (Arrays.stream(entry).anyMatch(s -> s.toLowerCase().contains(query))) {
-                    found = true; // Set found flag to true if match is found
-                    break; // Exit loop early since match is found
+                    // Display previous search counts during the current session
+                    System.out.println("Previous Searches:");
+                    for (Map.Entry<String, Integer> entry : searchCounts.entrySet()) {
+                        System.out.println(entry.getKey() + ": " + entry.getValue()); // Print previous search queries and their counts
+                    }
+                    System.out.println("-----------------------------");
+                } else {
+                    System.out.println("No data available"); // Print message if no matching data is found
                 }
-            }
-
-            // If matching data is found, perform the following actions
-            if (found) {
-                avlTree.insert(query); // Insert the search query into the AVLTree for frequency tracking
-                searchCounts.put(query, searchCounts.getOrDefault(query, 0) + 1); // Update search count for the query
-
-                Map<String, Integer> frequencyMap = avlTree.inOrder(); // Get sorted map of search query frequencies
-                List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(frequencyMap.entrySet()); // List to store sorted entries
-                // Sort entries based on frequency count in descending order
-                sortedEntries.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
-
-                // Get frequency count of the current search query
-                int frequency = avlTree.findFrequency(query); // Find frequency of the current query
-                // Print separator line and display search term and its frequency
-                System.out.println("-----------------------------");
-                System.out.println("Search Term: " + query); // Display the search term entered by the user
-                System.out.println("Count: " + frequency); // Display the frequency count of the search term
-                System.out.println("-----------------------------");
-
-                // Display previous search counts during the current session
-                System.out.println("Previous Searches:");
-                for (Map.Entry<String, Integer> entry : searchCounts.entrySet()) {
-                    System.out.println(entry.getKey() + ": " + entry.getValue()); // Print previous search queries and their counts
-                }
-                System.out.println("-----------------------------");
             } else {
-                System.out.println("No data available"); // Print message if no matching data is found
+                System.out.println("Enter Valid Search Query");
+                System.out.println();
             }
         }
         scanner.close(); // Close the scanner object after terminating the loop

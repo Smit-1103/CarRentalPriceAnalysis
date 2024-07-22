@@ -130,6 +130,30 @@ public class SpellChecker {
         }
     }
 
+    public static List<String> getSuggestionWord(String query) {
+        String csvFilePath = "cars1.csv"; // Replace with actual CSV file path
+        Set<String> vocabulary = VocabularyBuilder.buildVocabulary(csvFilePath);
+
+        CuckooHashTable hashTable = new CuckooHashTable();
+        for (String word : vocabulary) {
+            hashTable.insert(word);
+        }
+
+        List<String> suggestions = new ArrayList<>();
+
+        Map<String, Integer> editDistances = new HashMap<>();
+        for (String word : vocabulary) {
+            word = word.toLowerCase();
+            int distance = EditDistance.levenshteinDistance(query, word);
+            editDistances.put(word, distance);
+            suggestions.add(word);
+        }
+
+        MergeSort.mergeSort(suggestions, editDistances);
+
+        return suggestions;
+    }
+
     public static void main(String[] args) {
         String csvFilePath = "cars1.csv"; // Replace with actual CSV file path
         Set<String> vocabulary = VocabularyBuilder.buildVocabulary(csvFilePath);

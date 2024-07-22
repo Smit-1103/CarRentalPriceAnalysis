@@ -1,4 +1,5 @@
 package org.example;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,6 +18,7 @@ class Product {
         this.frequency = frequency;
     }
 }
+
 class PageRanking {
 
     // Function to read product data from CSV file
@@ -97,12 +99,17 @@ class PageRanking {
         return rankPages(productList);
     }
 
+    // Function to get top 10 items based on search query
+    public static List<Product> getTopItems(String filePath, String query) {
+        List<Product> rankedProducts = searchProducts(filePath, query);
+        return rankedProducts.size() > 10 ? rankedProducts.subList(0, 10) : rankedProducts;
+    }
+
     // Main function to demonstrate the page ranking and search functionality
     public static void main(String[] args) {
         String csvFilePath = "cars1.csv";
         Scanner scanner = new Scanner(System.in);
         String searchQuery;
-        List<Product> rankedProducts;
 
         while (true) {
             System.out.print("Enter Search Query (or type 'exit' to quit): ");
@@ -112,10 +119,10 @@ class PageRanking {
                 break;
             }
 
-            rankedProducts = searchProducts(csvFilePath, searchQuery);
-            System.out.println("Search Results:");
+            List<Product> topProducts = getTopItems(csvFilePath, searchQuery);
+            System.out.println("Top Search Results:");
             int count = 0;
-            for (Product product : rankedProducts) {
+            for (Product product : topProducts) {
                 System.out.println(" Product: " + product.name + ", Link: " + product.link + ", Price: " + product.price);
                 count++;
                 if (count >= 10) {

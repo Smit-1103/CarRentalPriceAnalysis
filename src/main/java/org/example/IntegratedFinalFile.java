@@ -6,13 +6,14 @@ import static org.example.SearchQuery.getSearchCount;
 import static org.example.SpellChecker.getSuggestionWord;
 
 public class IntegratedFinalFile {
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
         UserManager userManager = new UserManager();
-        Scanner scanner = new Scanner(System.in);
 
         while (true) {
             System.out.print("Enter 'login' to log in, 'signup' to sign up, or 'exit' to quit: ");
-            String action = scanner.nextLine().trim().toLowerCase();
+            String action = getInput().trim().toLowerCase();
 
             if (action.equals("exit")) {
                 break;
@@ -24,7 +25,7 @@ public class IntegratedFinalFile {
 
                 while (true) {
                     System.out.print("Enter username (email): ");
-                    username = scanner.nextLine().trim();
+                    username = getInput().trim();
                     if (!userManager.isEmailValid(username)) {
                         System.out.println("The username must be a valid email address. Please try again.");
                     } else {
@@ -34,7 +35,7 @@ public class IntegratedFinalFile {
 
                 while (true) {
                     System.out.print("Enter password: ");
-                    password = scanner.nextLine().trim();
+                    password = getInput().trim();
                     if (!userManager.isPasswordStrong(password)) {
                         System.out.println("Your password is not strong enough. Please follow these guidelines:");
                         System.out.println("1. At least 8 characters long");
@@ -58,13 +59,14 @@ public class IntegratedFinalFile {
 
             if (action.equals("login")) {
                 System.out.print("Enter username (email): ");
-                String username = scanner.nextLine().trim();
+                String username = getInput().trim();
                 System.out.print("Enter password: ");
-                String password = scanner.nextLine().trim();
+                String password = getInput().trim();
 
                 boolean success = userManager.login(username, password);
                 if (success) {
                     System.out.println("Login successful.");
+                    handleSearchAndSuggestions();
                 } else {
                     System.out.println("Login failed.");
                 }
@@ -75,10 +77,9 @@ public class IntegratedFinalFile {
     }
 
     private static void handleSearchAndSuggestions() {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Enter your search query (or write exit): ");
-            String query = scanner.nextLine().trim().toLowerCase();
+            String query = getInput().trim().toLowerCase();
 
             if (query.equals("exit")) {
                 break;
@@ -107,6 +108,16 @@ public class IntegratedFinalFile {
                 // No need to display top 10 products if the word is incorrect
             }
         }
-        scanner.close();
+    }
+
+    private static String getInput() {
+        try {
+            return scanner.nextLine();
+        } catch (NoSuchElementException e) {
+            // Handle the case where no input is available
+            System.out.println("Input error. Exiting...");
+            System.exit(1);
+            return ""; // This line is unreachable but required for compilation
+        }
     }
 }

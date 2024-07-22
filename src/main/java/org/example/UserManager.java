@@ -41,6 +41,23 @@ public class UserManager {
     }
 
     public boolean signup(String username, String password) {
+        if (!isEmailValid(username)) {
+            System.out.println("The username must be a valid email address.");
+            return false;
+        }
+
+        if (!isPasswordStrong(password)) {
+            System.out.println("Your password is not strong enough. Please follow these guidelines:");
+            System.out.println("1. At least 8 characters long");
+            System.out.println("2. Includes both upper and lower case letters");
+            System.out.println("3. Includes at least one digit");
+            System.out.println("4. Includes at least one special character (e.g., !@#$%^&*)");
+            return false;
+        } else if (isPasswordUsed(password)) {
+            System.out.println("Password has been used before. Try again.");
+            return false;
+        }
+
         return insertUser(username, password);
     }
 
@@ -77,12 +94,12 @@ public class UserManager {
         return false;
     }
 
-    public boolean isPasswordStrong(String password) {
+    boolean isPasswordStrong(String password) {
         Matcher matcher = PASSWORD_PATTERN.matcher(password);
         return matcher.matches();
     }
 
-    public boolean isEmailValid(String email) {
+    boolean isEmailValid(String email) {
         Matcher matcher = EMAIL_PATTERN.matcher(email);
         return matcher.matches();
     }

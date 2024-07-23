@@ -1,12 +1,13 @@
 package org.example;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.io.InputStreamReader;
 
 public class WordCompletionTries {
 
@@ -52,7 +53,6 @@ public class WordCompletionTries {
         }
 
         // How to look up every word in the Trie that begins with a specific prefix
-        // Prefix is the parameter to be searched for.
         public List<String> searchPrefix(String prefix) {
             List<String> results = new ArrayList<>(); // List to store matching words
             TrieNode current = root; // Start from the root
@@ -77,9 +77,6 @@ public class WordCompletionTries {
         }
 
         // Recursive approach to locate all words starting from a given node with an aid
-        // Param: node - The current node in the Trie
-        // Param: prefix - The prefix accumulated so far
-        // Param: results - List to store matching words
         private void findAllWords(TrieNode node, String prefix, List<String> results) {
             // Include the node in the results list if it indicates the end of a term.
             if (node.isEndOfWord) {
@@ -92,12 +89,11 @@ public class WordCompletionTries {
         }
     }
 
-    // The primary way to use the word completion program
-    public static void main(String[] args) {
-        Trie trie = new Trie(); // Launch a fresh instance of Trie.
-        String csvFile = "cars1.csv";
-        String line = ""; // each line that is read from the CSV into a string.
-        String cvsSplitBy = ","; // CSV delimiter
+    // Method to load data from the CSV file into the Trie
+    private static Trie loadTrieFromCSV(String csvFile) {
+        Trie trie = new Trie(); // Initialize a new Trie
+        String line = "";
+        String cvsSplitBy = ",";
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             // Read each line from the CSV file
@@ -108,10 +104,27 @@ public class WordCompletionTries {
                     trie.insert(carModel); // Put the automobile model into the Trie
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace(); // For any IO exceptions, print the stack trace.
+        }
 
-            // Set up a console reader to accept input from users.
-            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-            while (true) {
+        return trie;
+    }
+
+    // Method to get the list of words with a given prefix
+    public static List<String> getWordsWithPrefix(String prefix) {
+        String csvFile = "cars1.csv";
+        Trie trie = loadTrieFromCSV(csvFile); // Load data into the Trie
+        return trie.searchPrefix(prefix); // Get the list of words with the given prefix
+    }
+
+    // The primary way to use the word completion program
+    public static void main(String[] args) {
+        // Set up a console reader to accept input from users.
+        BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
+
+        while (true) {
+            try {
                 System.out.print("Enter prefix (type 'exit' to quit): ");
                 String prefix = consoleReader.readLine().trim(); // Check for prefixes in user input.
 
@@ -120,10 +133,10 @@ public class WordCompletionTries {
                     break;
                 }
 
-                // Search for words starting with the entered prefix
-                List<String> results = trie.searchPrefix(prefix);
+                // Get the list of words with the given prefix
+                List<String> results = getWordsWithPrefix(prefix);
 
-                // Depending on whether any words were found, display the findings.
+                // Display the results
                 if (results.isEmpty()) {
                     System.out.println("No words found with prefix '" + prefix + "'");
                 } else {
@@ -132,22 +145,9 @@ public class WordCompletionTries {
                         System.out.println(result); // Print each word found
                     }
                 }
+            } catch (IOException e) {
+                e.printStackTrace(); // For any IO exceptions, print the stack trace.
             }
-
-        } catch (IOException e) {
-            e.printStackTrace(); // For any IO exceptions, print the stack trace.
         }
     }
 }
-// summary
-/**
- * Define Trie Classes and TrieNode: Make a Trie class with methods to input words and search for prefixes, and a TrieNode class with a map of children and an end-of-word flag.
- *
- *Insert Words into Trie: Use the insert technique to enter each name of a car model that you read from a CSV file into the Trie.
- *
- * Find all words in the Trie that begin with a specific prefix by using the searchPrefix method, which ensures case insensitivity.
- *
- * Find All Words: To recursively gather all words beginning from a specific Trie node, use the helper method findAllWords.
- *
- * Interactive User Input: Continuously prompt the user to enter a prefix, search for matching words in the Trie, and display the results, or indicate if no matches are found.
- * */

@@ -9,13 +9,22 @@ class Product {
     String name;
     String link;
     String price;
+    String rating;
     int frequency;
+     // Added rating attribute
 
-    public Product(String name, String link, String price, int frequency) {
+
+    public Product(String name, String link, String price, String rating, int frequency) {
         this.name = name;
         this.link = link;
         this.price = price;
+        this.rating = rating;
         this.frequency = frequency;
+
+    }
+    @Override
+    public String toString() {
+        return "Product: " + name + ", Link: " + link + ", Price: " + price + ", Rating: " + rating;
     }
 }
 
@@ -29,7 +38,7 @@ class PageRanking {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (values.length >= 2) {
-                    productList.add(new Product(values[0], values[4], values[2], 0));
+                    productList.add(new Product(values[0], values[4], values[2], values[3], 0));
                 }
             }
         } catch (IOException e) {
@@ -105,6 +114,40 @@ class PageRanking {
         return rankedProducts.size() > 10 ? rankedProducts.subList(0, 10) : rankedProducts;
     }
 
+    // Function to get all items based on search query
+    public static List<Product> getAllItems(String filePath, String query) {
+        List<Product> rankedProducts = searchProducts(filePath, query);
+        return rankedProducts; // Return the entire list
+    }
+
+    // Function to display all details of all products based on search query
+    public static void displayAllDetails(String filePath, String query) {
+        List<Product> allProducts = getAllItems(filePath, query);
+
+        System.out.println("All Products Details:");
+        for (Product product : allProducts) {
+            System.out.println("Name: " + product.name);
+            System.out.println("Link: " + product.link);
+            System.out.println("Price: " + product.price);
+            System.out.println("Frequency: " + product.frequency);
+            System.out.println(); // Add a blank line for readability
+        }
+    }
+    // Function to rank pages based on rating (String)
+    public static List<Product> rankPagesByRating(List<Product> productList) {
+        productList.sort((p1, p2) -> {
+            try {
+                double rating1 = Double.parseDouble(p1.rating);
+                double rating2 = Double.parseDouble(p2.rating);
+                return Double.compare(rating2, rating1);
+            } catch (NumberFormatException e) {
+                return p1.rating.compareTo(p2.rating); // Fallback to string comparison if parsing fails
+            }
+        });
+        return productList;
+    }
+
+
     // Main function to demonstrate the page ranking and search functionality
     public static void main(String[] args) {
         String csvFilePath = "cars1.csv";
@@ -119,17 +162,22 @@ class PageRanking {
                 break;
             }
 
+            // Display top 10 items
             List<Product> topProducts = getTopItems(csvFilePath, searchQuery);
             System.out.println("Top Search Results:");
             int count = 0;
             for (Product product : topProducts) {
-                System.out.println(" Product: " + product.name + ", Link: " + product.link + ", Price: " + product.price);
+                System.out.println("Product: " + product.name + ", Link: " + product.link + ", Price: " + product.price);
                 count++;
                 if (count >= 10) {
                     break;
                 }
             }
+
             System.out.println();
+
+            // Display all details of all products
+            displayAllDetails(csvFilePath, searchQuery);
         }
 
         scanner.close();

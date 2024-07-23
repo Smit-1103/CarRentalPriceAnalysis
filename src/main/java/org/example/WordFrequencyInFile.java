@@ -1,24 +1,10 @@
 package org.example;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-/**
- * Task3: Frequency Count Using Boyer-Moore Algorithm
- *
- * Objective: Implement a frequency count feature that shows the number of occurrences of a word
- * in your files using the Boyer-Moore algorithm.
- *
- * Implementation:
- * - Implement the Boyer-Moore algorithm for efficient pattern searching.
- * - Read and process content from a CSV file.
- * - Prompt user input for words to search and count occurrences.
- *
- * Output:
- * - Display the number of occurrences of the word in the CSV file.
- * - Handle cases where the word is not found or the file is empty.
- */
 public class WordFrequencyInFile {
 
     // Function to preprocess the pattern and prepare bad character heuristic array
@@ -43,7 +29,7 @@ public class WordFrequencyInFile {
      * @param pattern The pattern (word) to search for.
      * @return The number of occurrences of the pattern in the text.
      */
-    private static int boyerMooreSearch(String text, String pattern) {
+    static int boyerMooreSearch(String text, String pattern) {
         int m = pattern.length();
         int n = text.length();
         int[] badChar = new int[256]; // Array to store bad character heuristic
@@ -83,7 +69,7 @@ public class WordFrequencyInFile {
      * @param filePath The path to the CSV file.
      * @return The content of the CSV file as a single lowercase string.
      */
-    private static String readCSV(String filePath) {
+    static String readCSV(String filePath) {
         StringBuilder content = new StringBuilder(); // StringBuilder to store file content
         String line;
 
@@ -100,20 +86,32 @@ public class WordFrequencyInFile {
     }
 
     /**
-     * Main method to orchestrate the program execution.
-     * @param args Command-line arguments (not used in this implementation).
+     * Counts the occurrences of a given word in the CSV file content.
+     *
+     * @param word The word to search for.
+     * @param filePath The path to the CSV file.
+     * @return The count of occurrences of the word in the file.
      */
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        String filePath = "cars1.csv"; // File path of the CSV file
+    public static int countOccurrences(String word) {
+        String filePath = "cars1.csv";
         String content = readCSV(filePath); // Read CSV file and get content as string
 
         // Handle empty file or read error
         if (content.isEmpty()) {
             System.out.println("The file is empty or could not be read.");
-            return;
+            return 0;
         }
+
+        return boyerMooreSearch(content, word.toLowerCase()); // Convert word to lower case and count occurrences
+    }
+
+    /**
+     * Main method to orchestrate the program execution.
+     * @param args Command-line arguments (not used in this implementation).
+     */
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String filePath = "cars1.csv"; // File path of the CSV file
 
         boolean continueChecking = true;
         while (continueChecking) {
@@ -127,10 +125,8 @@ public class WordFrequencyInFile {
                 continue;
             }
 
-            word = word.toLowerCase(); // Convert word to lower case
-
             // Count occurrences of word in content using Boyer-Moore algorithm
-            int occurrences = boyerMooreSearch(content, word);
+            int occurrences = countOccurrences(word);
 
             // Print number of occurrences found
             if (occurrences > 0) {

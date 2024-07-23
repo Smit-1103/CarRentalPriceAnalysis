@@ -1,5 +1,6 @@
 package org.example;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.util.*;
 
 class Product {
     String name;
+    String ImgLink;
     String link;
     String price;
     String rating;
@@ -14,8 +16,9 @@ class Product {
      // Added rating attribute
 
 
-    public Product(String name, String link, String price, String rating, int frequency) {
+    public Product(String name,String ImgLink, String link, String price, String rating, int frequency) {
         this.name = name;
+        this.ImgLink = ImgLink;
         this.link = link;
         this.price = price;
         this.rating = rating;
@@ -24,7 +27,7 @@ class Product {
     }
     @Override
     public String toString() {
-        return "Product: " + name + ", Link: " + link + ", Price: " + price + ", Rating: " + rating;
+        return String.format("%-30s %-20s %-8s %-10s %-10s", name, ImgLink, link, price, rating);
     }
 }
 
@@ -38,7 +41,7 @@ class PageRanking {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
                 if (values.length >= 2) {
-                    productList.add(new Product(values[0], values[4], values[2], values[3], 0));
+                    productList.add(new Product(values[0], values[1],values[4], values[2], values[3], 0));
                 }
             }
         } catch (IOException e) {
@@ -127,6 +130,7 @@ class PageRanking {
         System.out.println("All Products Details:");
         for (Product product : allProducts) {
             System.out.println("Name: " + product.name);
+            System.out.println("Image Link: " + product.ImgLink);
             System.out.println("Link: " + product.link);
             System.out.println("Price: " + product.price);
             System.out.println("Frequency: " + product.frequency);
@@ -167,7 +171,7 @@ class PageRanking {
             System.out.println("Top Search Results:");
             int count = 0;
             for (Product product : topProducts) {
-                System.out.println("Product: " + product.name + ", Link: " + product.link + ", Price: " + product.price);
+                System.out.println("Product: " + product.name + "Image Link: " + product.ImgLink + ", Product Link: " + product.link + ", Price: " + product.price);
                 count++;
                 if (count >= 10) {
                     break;

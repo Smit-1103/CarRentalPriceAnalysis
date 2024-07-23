@@ -8,14 +8,16 @@ import static org.example.SearchQuery.getSearchCount;
 import static org.example.SpellChecker.getSuggestionWord;
 import static org.example.WordCompletionTries.getWordsWithPrefix;
 import static org.example.WordFrequencyInFile.countOccurrences;
-import static org.example.PageRanking.getAllItems; // Import the method to get all items
 
 public class IntegratedFinalFile {
     private static Scanner scanner = new Scanner(System.in);
     private static UserManager userManager = new UserManager();
     private static final Pattern INVALID_INPUT_PATTERN = Pattern.compile("[^a-zA-Z0-9 ]"); // Regex to detect special characters
+    private static final int MAX_LINK_LENGTH = 20;
+    private static final Map<Integer, String> linkMap = new HashMap<>();
 
     public static void main(String[] args) {
+        printWelcomeMessage();
         while (true) {
             System.out.print("Enter 'login' to log in, 'signup' to sign up, or 'exit' to quit: ");
             String action = getInput().trim().toLowerCase();
@@ -34,6 +36,19 @@ public class IntegratedFinalFile {
         }
 
         scanner.close();
+    }
+
+    private static void printWelcomeMessage() {
+        System.out.println("***************************************");
+        System.out.println("*                                     *");
+        System.out.println("*       Welcome to Lencer Cars!       *");
+        System.out.println("*                                     *");
+        System.out.println("***************************************");
+        System.out.println("*                                     *");
+        System.out.println("*   Your trusted car rental service   *");
+        System.out.println("*                                     *");
+        System.out.println("***************************************");
+        System.out.println();
     }
 
     private static void handleSignup() {
@@ -91,7 +106,7 @@ public class IntegratedFinalFile {
 
     private static void handleSearchAndSuggestions() {
         while (true) {
-            System.out.print("Enter your search query (or write exit): ");
+            System.out.print("Search a car (or write exit): ");
             String query = getInput().trim().toLowerCase();
 
             if (query.equals("exit")) {
@@ -112,13 +127,12 @@ public class IntegratedFinalFile {
             List<String> suggestions = getSuggestionWord(query); // Assuming this method is implemented elsewhere
             List<String> results = getWordsWithPrefix(query);
 
-            if(results.size() >= 1) {
+            if (results.size() >= 1) {
                 System.out.println("Word Suggestions: ");
                 for (String result : results) {
                     System.out.println(result);
                 }
             }
-
 
             if (suggestions.isEmpty()) {
                 System.out.println("No suggestions available.");
@@ -129,37 +143,30 @@ public class IntegratedFinalFile {
                 List<Product> topProducts = pageRanking.getTopItems("cars1.csv", query);
 
                 System.out.println("Top 10 Products:");
-                int count = 0;
-                for (Product product : topProducts) {
-                    System.out.println(product);
-                    count++;
-                    if (count >= 10) break;
-                }
+                printProductsTable(topProducts);
 
-                System.out.println("Press 1 to sort by rating or 2 to view the full list of products:");
+                System.out.println("\nPress 1 to sort by rating or 2 to view the full list of products:");
                 String choice = getInput().trim();
                 if (choice.equals("1")) {
                     List<Product> allProducts = pageRanking.readProductData("cars1.csv");
-                    List<Product> fp = allProducts.stream()
+                    List<Product> filteredProducts = allProducts.stream()
                             .filter(product -> product.name.toLowerCase().contains(query))
                             .collect(Collectors.toList());
-                    List<Product> sortedProducts = pageRanking.rankPagesByRating(fp);
+
+                    // Using Quick Sort to sort the products by rating
+                    quickSort(filteredProducts, 0, filteredProducts.size() - 1);
 
                     System.out.println("Products sorted by rating:");
-                    for (Product product : sortedProducts) {
-                        System.out.println(product);
-                    }
+                    printProductsTable(filteredProducts);
                 } else if (choice.equals("2")) {
                     List<Product> allProducts = pageRanking.readProductData("cars1.csv");
-                    List<Product> fp = allProducts.stream()
+                    List<Product> filteredProducts = allProducts.stream()
                             .filter(product -> product.name.toLowerCase().contains(query))
                             .collect(Collectors.toList());
                     System.out.println("Full list of products:");
-                    for (Product product : fp) {
-                        System.out.println(product);
-                    }
+                    printProductsTable(filteredProducts);
                 } else {
-                    System.out.println("Invalid option. Please choose 1 or 2.");
+                    System.out.println("Invalid option.");
                 }
             } else {
                 System.out.println("Spelling is Wrong. Did you mean " + suggestions.get(0) + "?");
@@ -168,7 +175,64 @@ public class IntegratedFinalFile {
         }
     }
 
+    private static void printProductsTable(List<Product> products) {
+        System.out.println("+-----------------------------+");
+        for (Product product : products) {
+            System.out.println("Name: " + product.name);
+            System.out.println("Image Link: " + product.ImgLink);
+            System.out.println("Link: " + product.link);
+            System.out.println("Price: " + product.price);
+            System.out.println("Rating: " + product.rating);
+            System.out.println("+-----------------------------+");
+        }
+    }
+    private static void quickSort(List<Product> products, int low, int high) {
+        if (low < high) {
+            int pi = partition(products, low, high);
 
+            quickSort(products, low, pi - 1);
+            quickSort(products, pi + 1, high);
+        }
+    }
+
+    private static int partition(List<Product> products, int low, int high) {
+        Product pivot = products.get(high);
+        double pivotRating = convertRatingToDouble(pivot.rating); // Convert pivot rating to double
+        int i = (low - 1);
+        for (int j = low; j < high; j++) {
+            double currentRating = convertRatingToDouble(products.get(j).rating); // Convert current rating to double
+            if (currentRating >= pivotRating) {
+                i++;
+
+                // Swap products[i] and products[j]
+                Product temp = products.get(i);
+                products.set(i, products.get(j));
+                products.set(j, temp);
+            }
+        }
+
+        // Swap products[i+1] and products[high] (or pivot)
+        Product temp = products.get(i + 1);
+        products.set(i + 1, products.get(high));
+        products.set(high, temp);
+
+        return i + 1;
+    }
+
+    /**
+     * Convert a rating string to a double for comparison.
+     * Assumes that the string can be parsed to a double. Handle cases where parsing might fail if necessary.
+     */
+    private static double convertRatingToDouble(String rating) {
+        try {
+            return Double.parseDouble(rating);
+        } catch (NumberFormatException e) {
+            // Handle the case where the rating string is not a valid number
+            // For now, return a default value (e.g., 0.0) or throw an exception
+            System.err.println("Invalid rating format: " + rating);
+            return 0.0; // Or handle as appropriate
+        }
+    }
 
     private static boolean containsSpecialCharacters(String input) {
         return INVALID_INPUT_PATTERN.matcher(input).find();

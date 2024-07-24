@@ -82,9 +82,9 @@ public class UserManager {
         }
 
         if (isPasswordUsed(password)) {
-            System.out.println(PASSWORD_USED_MSG);
             return false;
-        }
+        }//            System.out.println(PASSWORD_USED_MSG);
+
 
         String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

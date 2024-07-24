@@ -13,21 +13,26 @@ class Product {
     String price;
     String rating;
     int frequency;
-     // Added rating attribute
+    String carPassenger;
+    String carTransmissionType;
+    String carSpecification;
 
-
-    public Product(String name,String ImgLink, String link, String price, String rating, int frequency) {
+    public Product(String name, String ImgLink, String link, String price, String rating, int frequency, String carPassenger, String carTransmissionType, String carSpecification) {
         this.name = name;
         this.ImgLink = ImgLink;
         this.link = link;
         this.price = price;
         this.rating = rating;
         this.frequency = frequency;
-
+        this.carPassenger = carPassenger;
+        this.carTransmissionType = carTransmissionType;
+        this.carSpecification = carSpecification;
     }
+
     @Override
     public String toString() {
-        return String.format("%-30s %-20s %-8s %-10s %-10s", name, ImgLink, link, price, rating);
+        return String.format("Name: %s\nImage Link: %s\nLink: %s\nPrice: %s\nRating: %s\nPassengers Limit: %s\nCar Transmission Type: %s\nCar Specification: %s\n",
+                name, ImgLink, link, price, rating, carPassenger, carTransmissionType, carSpecification);
     }
 }
 
@@ -38,10 +43,11 @@ class PageRanking {
         List<Product> productList = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
+            br.readLine(); // Skip header line
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                if (values.length >= 2) {
-                    productList.add(new Product(values[0], values[1],values[4], values[2], values[3], 0));
+                if (values.length >= 8) {  // Ensure there are enough columns in the CSV
+                    productList.add(new Product(values[0], values[1], values[4], values[2], values[3], 0, values[5], values[6], values[7]));
                 }
             }
         } catch (IOException e) {
@@ -129,14 +135,11 @@ class PageRanking {
 
         System.out.println("All Products Details:");
         for (Product product : allProducts) {
-            System.out.println("Name: " + product.name);
-            System.out.println("Image Link: " + product.ImgLink);
-            System.out.println("Link: " + product.link);
-            System.out.println("Price: " + product.price);
-            System.out.println("Frequency: " + product.frequency);
+            System.out.println(product.toString());
             System.out.println(); // Add a blank line for readability
         }
     }
+
     // Function to rank pages based on rating (String)
     public static List<Product> rankPagesByRating(List<Product> productList) {
         productList.sort((p1, p2) -> {
@@ -150,7 +153,6 @@ class PageRanking {
         });
         return productList;
     }
-
 
     // Main function to demonstrate the page ranking and search functionality
     public static void main(String[] args) {
@@ -171,7 +173,7 @@ class PageRanking {
             System.out.println("Top Search Results:");
             int count = 0;
             for (Product product : topProducts) {
-                System.out.println("Product: " + product.name + "Image Link: " + product.ImgLink + ", Product Link: " + product.link + ", Price: " + product.price);
+                System.out.println(product.toString());
                 count++;
                 if (count >= 10) {
                     break;

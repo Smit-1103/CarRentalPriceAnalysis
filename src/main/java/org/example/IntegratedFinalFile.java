@@ -116,13 +116,19 @@ public class IntegratedFinalFile {
     }
 
     private static void handleSearchAndSuggestions() throws InterruptedException {
-        System.out.print("Do you want to perform the web scraping? (yes/no): ");
-        String n = scanner.nextLine().trim();
-        if(n.equals("yes")) {
-            shouldScrapping();
-            Thread.sleep(5000);
-        } else {
-            System.out.println("Scraping Skipped");
+        while (true) {
+            System.out.print("Do you want to perform the web scraping? (yes/no): ");
+            String n = scanner.nextLine().trim().toLowerCase();
+            if (n.equals("yes")) {
+                shouldScrapping();
+                Thread.sleep(5000);
+                break;
+            } else if (n.equals("no")) {
+                System.out.println("Scraping Skipped");
+                break;
+            } else {
+                System.out.println("Invalid option. Please enter 'yes' or 'no'.");
+            }
         }
         while (true) {
             System.out.print("Search a car (or write exit): ");
@@ -169,7 +175,7 @@ public class IntegratedFinalFile {
                     System.out.println("Top 10 Products:");
                     printProductsTable(topProducts);
 
-                    
+
                     String choice = "";
                     while(true) {
                         System.out.println("\nPress 1 to sort by rating or 2 to view the full list of products:");
@@ -219,6 +225,9 @@ public class IntegratedFinalFile {
             System.out.println("Link: " + product.link);
             System.out.println("Price: " + product.price);
             System.out.println("Rating: " + product.rating);
+            System.out.println("passengers limit: "+ product.carPassenger);
+            System.out.println("Car Specification: "+ product.carSpecification);
+            System.out.println("Car Transmission type: "+ product.carTransmissionType);
             System.out.println("+-----------------------------+");
         }
     }

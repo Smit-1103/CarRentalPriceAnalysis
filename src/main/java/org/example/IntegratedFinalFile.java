@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.example.Main.shouldScrapping;
 import static org.example.SearchQuery.getSearchCount;
 import static org.example.SpellChecker.getSuggestionWord;
 import static org.example.WordCompletionTries.getWordsWithPrefix;
@@ -16,7 +17,7 @@ public class IntegratedFinalFile {
     private static final int MAX_LINK_LENGTH = 20;
     private static final Map<Integer, String> linkMap = new HashMap<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         printWelcomeMessage();
         while (true) {
             System.out.print("Enter 'login' to log in, 'signup' to sign up, or 'exit' to quit: ");
@@ -41,7 +42,7 @@ public class IntegratedFinalFile {
     private static void printWelcomeMessage() {
         System.out.println("***************************************");
         System.out.println("*                                     *");
-        System.out.println("*       Welcome to Lencer Cars!       *");
+        System.out.println("*       Welcome to Lancer Cars!       *");
         System.out.println("*                                     *");
         System.out.println("***************************************");
         System.out.println("*                                     *");
@@ -89,7 +90,7 @@ public class IntegratedFinalFile {
         }
     }
 
-    private static void handleLogin() {
+    private static void handleLogin() throws InterruptedException {
         System.out.print("Enter username (email): ");
         String username = getInput().trim();
         System.out.print("Enter password: ");
@@ -104,7 +105,25 @@ public class IntegratedFinalFile {
         }
     }
 
-    private static void handleSearchAndSuggestions() {
+    // Method to restrict pure numbers in input
+    public static boolean isPureNumber(String input) {
+        for (char c : input.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void handleSearchAndSuggestions() throws InterruptedException {
+        System.out.print("Do you want to perform the web scraping? (yes/no): ");
+        String n = scanner.nextLine().trim();
+        if(n.equals("yes")) {
+            shouldScrapping();
+            Thread.sleep(5000);
+        } else {
+            System.out.println("Scraping Skipped");
+        }
         while (true) {
             System.out.print("Search a car (or write exit): ");
             String query = getInput().trim().toLowerCase();
@@ -113,8 +132,8 @@ public class IntegratedFinalFile {
                 break;
             }
 
-            if (query.isEmpty() || containsSpecialCharacters(query)) {
-                System.out.println("Invalid input. Please do not use special characters.");
+            if (query.isEmpty() || containsSpecialCharacters(query) || isPureNumber(query)) {
+                System.out.println("Invalid input. Please do not use special characters or pure numbers.");
                 continue; // Prompt the user again
             }
 
@@ -124,53 +143,70 @@ public class IntegratedFinalFile {
             int wordInFileFreq = countOccurrences(query);
             System.out.println("This word occurred " + wordInFileFreq + " times in CSV file.");
 
-            List<String> suggestions = getSuggestionWord(query); // Assuming this method is implemented elsewhere
+            // Provide word suggestions for all valid inputs
             List<String> results = getWordsWithPrefix(query);
-
             if (results.size() >= 1) {
                 System.out.println("Word Suggestions: ");
                 for (String result : results) {
                     System.out.println(result);
                 }
+
             }
 
-            if (suggestions.isEmpty()) {
-                System.out.println("No suggestions available.");
-            } else if (query.equals(suggestions.get(0))) {
-                System.out.println("Word is Correct");
 
-                PageRanking pageRanking = new PageRanking(); // Adjust as necessary to fit your setup
-                List<Product> topProducts = pageRanking.getTopItems("cars1.csv", query);
+            // Perform spell check only if query has more than 3 letters
+            if (query.length() > 3) {
+                List<String> suggestions = getSuggestionWord(query); // Assuming this method is implemented elsewhere
 
-                System.out.println("Top 10 Products:");
-                printProductsTable(topProducts);
+                if (suggestions.isEmpty()) {
+                    System.out.println("No suggestions available.");
+                } else if (query.equals(suggestions.get(0))) {
+                    System.out.println("Word is Correct");
 
-                System.out.println("\nPress 1 to sort by rating or 2 to view the full list of products:");
-                String choice = getInput().trim();
-                if (choice.equals("1")) {
-                    List<Product> allProducts = pageRanking.readProductData("cars1.csv");
-                    List<Product> filteredProducts = allProducts.stream()
-                            .filter(product -> product.name.toLowerCase().contains(query))
-                            .collect(Collectors.toList());
+                    PageRanking pageRanking = new PageRanking(); // Adjust as necessary to fit your setup
+                    List<Product> topProducts = pageRanking.getTopItems("cars1.csv", query);
 
-                    // Using Quick Sort to sort the products by rating
-                    quickSort(filteredProducts, 0, filteredProducts.size() - 1);
+                    System.out.println("Top 10 Products:");
+                    printProductsTable(topProducts);
 
-                    System.out.println("Products sorted by rating:");
-                    printProductsTable(filteredProducts);
-                } else if (choice.equals("2")) {
-                    List<Product> allProducts = pageRanking.readProductData("cars1.csv");
-                    List<Product> filteredProducts = allProducts.stream()
-                            .filter(product -> product.name.toLowerCase().contains(query))
-                            .collect(Collectors.toList());
-                    System.out.println("Full list of products:");
-                    printProductsTable(filteredProducts);
+                    
+                    String choice = "";
+                    while(true) {
+                        System.out.println("\nPress 1 to sort by rating or 2 to view the full list of products:");
+                        choice = getInput().trim();
+                        if(choice.equals("1") || choice.equals("2")) {
+                            break;
+                        } else {
+                            System.out.println("Invalid option. Try Again");
+                        }
+                    }
+                    if (choice.equals("1")) {
+                        List<Product> allProducts = pageRanking.readProductData("cars1.csv");
+                        String finalQuery = query;
+                        List<Product> filteredProducts = allProducts.stream()
+                                .filter(product -> product.name.toLowerCase().contains(finalQuery))
+                                .collect(Collectors.toList());
+
+                        // Using Quick Sort to sort the products by rating
+                        quickSort(filteredProducts, 0, filteredProducts.size() - 1);
+
+                        System.out.println("Products sorted by rating:");
+                        printProductsTable(filteredProducts);
+                    } else if (choice.equals("2")) {
+                        List<Product> allProducts = pageRanking.readProductData("cars1.csv");
+                        String finalQuery1 = query;
+                        List<Product> filteredProducts = allProducts.stream()
+                                .filter(product -> product.name.toLowerCase().contains(finalQuery1))
+                                .collect(Collectors.toList());
+                        System.out.println("Full list of products:");
+                        printProductsTable(filteredProducts);
+                    } else {
+                        System.out.println("Invalid option.");
+                    }
                 } else {
-                    System.out.println("Invalid option.");
+                    System.out.println("Spelling is Wrong. Did you mean " + suggestions.get(0) + "?");
+                    // No need to display top 10 products if the word is incorrect
                 }
-            } else {
-                System.out.println("Spelling is Wrong. Did you mean " + suggestions.get(0) + "?");
-                // No need to display top 10 products if the word is incorrect
             }
         }
     }
@@ -186,6 +222,7 @@ public class IntegratedFinalFile {
             System.out.println("+-----------------------------+");
         }
     }
+
     private static void quickSort(List<Product> products, int low, int high) {
         if (low < high) {
             int pi = partition(products, low, high);
@@ -243,7 +280,7 @@ public class IntegratedFinalFile {
             return scanner.nextLine();
         } catch (NoSuchElementException e) {
             // Handle the case where no input is available
-            System.out.println("Input error. Exiting...");
+            System.out.println("Input error. Exiting..."+e);
             System.exit(1);
             return ""; // This line is unreachable but required for compilation
         }

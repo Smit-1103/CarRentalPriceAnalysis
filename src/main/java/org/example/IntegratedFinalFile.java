@@ -121,7 +121,6 @@ public class IntegratedFinalFile {
             String n = scanner.nextLine().trim().toLowerCase();
             if (n.equals("yes")) {
                 shouldScrapping();
-                Thread.sleep(5000);
                 break;
             } else if (n.equals("no")) {
                 System.out.println("Scraping Skipped");
@@ -143,23 +142,25 @@ public class IntegratedFinalFile {
                 continue; // Prompt the user again
             }
 
+            //AYUSH task Search frequency
             int frequency = getSearchCount(query); // Assuming this method is implemented elsewhere
             System.out.println("This query is searched for " + frequency + " times.");
 
+            //SMIT task -word search in file
             int wordInFileFreq = countOccurrences(query);
             System.out.println("This word occurred " + wordInFileFreq + " times in CSV file.");
 
-            // Provide word suggestions for all valid inputs
+            // SANKET TASK - Word complition Provide word suggestions for all valid inputs
             List<String> results = getWordsWithPrefix(query);
             if (results.size() >= 1) {
-                System.out.println("Word Suggestions: ");
+                System.out.println("You can complete your word with the use of this \nWord Suggestions: ");
                 for (String result : results) {
                     System.out.println(result);
                 }
 
             }
 
-
+            //TIMIL TASK
             // Perform spell check only if query has more than 3 letters
             if (query.length() > 3) {
                 List<String> suggestions = getSuggestionWord(query); // Assuming this method is implemented elsewhere
@@ -169,6 +170,7 @@ public class IntegratedFinalFile {
                 } else if (query.equals(suggestions.get(0))) {
                     System.out.println("Word is Correct");
 
+                    //Gravin's task - page ranking
                     PageRanking pageRanking = new PageRanking(); // Adjust as necessary to fit your setup
                     List<Product> topProducts = pageRanking.getTopItems("cars1.csv", query);
 
@@ -176,6 +178,7 @@ public class IntegratedFinalFile {
                     printProductsTable(topProducts);
 
 
+                    //SMIT task - rating based sorting
                     String choice = "";
                     while(true) {
                         System.out.println("\nPress 1 to sort by rating or 2 to view the full list of products:");
@@ -218,20 +221,21 @@ public class IntegratedFinalFile {
     }
 
     private static void printProductsTable(List<Product> products) {
-        System.out.println("+-----------------------------+");
+        System.out.println("+------------------------------------------------------------------------------+");
         for (Product product : products) {
-            System.out.println("Name: " + product.name);
+            System.out.println("Name of the car: " + product.name);
             System.out.println("Image Link: " + product.ImgLink);
-            System.out.println("Link: " + product.link);
-            System.out.println("Price: " + product.price);
+            System.out.println("Product Link: " + product.link);
+            System.out.println("Price per day: " + product.price);
             System.out.println("Rating: " + product.rating);
             System.out.println("passengers limit: "+ product.carPassenger);
             System.out.println("Car Specification: "+ product.carSpecification);
             System.out.println("Car Transmission type: "+ product.carTransmissionType);
-            System.out.println("+-----------------------------+");
+            System.out.println("+---------------------------------------------------------------------------+");
         }
     }
 
+    //quick sort implementation
     private static void quickSort(List<Product> products, int low, int high) {
         if (low < high) {
             int pi = partition(products, low, high);

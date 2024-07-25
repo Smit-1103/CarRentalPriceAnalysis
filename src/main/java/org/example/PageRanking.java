@@ -104,6 +104,7 @@ class PageRanking {
     }
 
     // Function to rank pages based on frequency count
+    //same as quick sort
     public static List<Product> rankPages(List<Product> productList) {
         productList.sort((p1, p2) -> Integer.compare(p2.frequency, p1.frequency));
         return productList;

@@ -63,12 +63,6 @@ public class WordFrequencyInFile {
         return count;
     }
 
-    /**
-     * Function to read CSV file and return its content as a single string.
-     *
-     * @param filePath The path to the CSV file.
-     * @return The content of the CSV file as a single lowercase string.
-     */
     static String readCSV(String filePath) {
         StringBuilder content = new StringBuilder(); // StringBuilder to store file content
         String line;
@@ -85,13 +79,6 @@ public class WordFrequencyInFile {
         return content.toString().toLowerCase(); // Convert content to lower case
     }
 
-    /**
-     * Counts the occurrences of a given word in the CSV file content.
-     *
-     * @param word The word to search for.
-     * @param filePath The path to the CSV file.
-     * @return The count of occurrences of the word in the file.
-     */
     public static int countOccurrences(String word) {
         String filePath = "cars1.csv";
         String content = readCSV(filePath); // Read CSV file and get content as string
@@ -105,10 +92,6 @@ public class WordFrequencyInFile {
         return boyerMooreSearch(content, word.toLowerCase()); // Convert word to lower case and count occurrences
     }
 
-    /**
-     * Main method to orchestrate the program execution.
-     * @param args Command-line arguments (not used in this implementation).
-     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String filePath = "cars1.csv"; // File path of the CSV file

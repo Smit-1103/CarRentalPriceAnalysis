@@ -27,7 +27,6 @@ public class Main {
     static void shouldScrapping(){
         // Prompt the user for input
         Scanner scanner = new Scanner(System.in);
-//        System.out.print("Do you want to perform the web scraping? (yes/no): ");
         String userInput = "yes";
 
         // Check user input and act accordingly
@@ -45,12 +44,7 @@ public class Main {
                     driver.quit();
                 }
             }
-        } else {
-            //System.out.println("Web scraping skipped.");
         }
-
-        // Close the scanner
-        //scanner.close();
     }
 
     // This method scrapes data and saves it to an Excel file.
@@ -164,50 +158,6 @@ public class Main {
                 row.createCell(2).setCellValue(rating);
                 row.createCell(3).setCellValue(price);
             }
-
-//            // Scraping the data from PAGE 2
-//            driver.get("https://getaround.com/search?address=Fairmount%2C+Newark&address_source=poi&poi_id=2949&latitude=40.7426&longitude=-74.1921&city_display_name=&start_date=2024-06-13&start_time=07%3A30&end_date=2024-06-15&end_time=06%3A30&country_scope=US&display_view=list&pickup_method=false&pickup_method_explicit_choice=&administrative_area=");
-//            Thread.sleep(4000);
-//            WebElement footer2 = driver.findElement(By.className("corporate_footer__container"));
-//            action.scrollToElement(footer2).perform();
-//            boolean loadMoreVisible2 = true;
-//
-//            while (loadMoreVisible2) {
-//                try {
-//                    WebElement loadmore = driver.findElement(By.className("search-results__load-more-button"));
-//                    if (loadmore.isDisplayed()) {
-//                        action.scrollToElement(footer2).perform();
-//                        Thread.sleep(2000);
-//                        loadmore.click();
-//                        Thread.sleep(2000);
-//                        action.scrollToElement(footer2).perform();
-//                    } else {
-//                        loadMoreVisible2 = false;
-//                    }
-//                } catch (NoSuchElementException e) {
-//                    loadMoreVisible2 = false;
-//                }
-//                System.out.println("Load more clicked");
-//            }
-//
-//            // Find and write car data from page 2 to Excel
-//            List<WebElement> carImgsite2 = driver.findElements(By.className("car_card__header"));
-//            List<WebElement> carNamesite2 = driver.findElements(By.className("car_card__title"));
-//            List<WebElement> carRatingsite2 = driver.findElements(By.className("cobalt-rating__label"));
-//            List<WebElement> carPricesite2 = driver.findElements(By.className("car_card__pricing-value"));
-//
-//            for (int i = 0; i < carImgsite2.size(); i++) {
-//                String name2 = carNamesite2.get(i).getText();
-//                String imgURL2 = carImgsite2.get(i).getAttribute("data-background-image");
-//                String rating2 = carRatingsite2.get(i).getText();
-//                String price2 = carPricesite2.get(i).getText();
-//
-//                Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-//                row.createCell(0).setCellValue(name2);
-//                row.createCell(1).setCellValue(imgURL2);
-//                row.createCell(2).setCellValue(rating2);
-//                row.createCell(3).setCellValue(price2);
-//            }
 
         } catch (Exception e) {
             e.printStackTrace();  // Print stack trace if an exception occurs

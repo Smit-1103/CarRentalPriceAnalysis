@@ -139,6 +139,7 @@ public class SpellChecker {
             hashTable.insert(word);
         }
 
+
         List<String> suggestions = new ArrayList<>();
 
         Map<String, Integer> editDistances = new HashMap<>();

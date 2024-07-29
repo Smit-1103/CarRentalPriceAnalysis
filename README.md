@@ -11,7 +11,9 @@ This project showcases the implementation of various advanced data structures an
 
 ## Key Tasks Performed
 
-### Web Crawling using 
+### Web Crawling with Selenium
+Implemented web crawling using Selenium, including handling pop-ups and browser control.
+
 ### URL Extraction
 A Java program that reads from CSV files to extract URLs from text.
 

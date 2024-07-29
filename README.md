@@ -48,4 +48,4 @@ Developed an inverted indexing system in the `IntegratedFinalFile` Java class fo
 ### Installation
 1. Clone the repository:
    ```sh
-   git clone 
+   git clone https://github.com/Smit-1103/CarRentalPriceAnalysis.git

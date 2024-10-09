@@ -52,7 +52,7 @@ Developed an inverted indexing system in the `IntegratedFinalFile` Java class fo
    ```sh
    git clone https://github.com/Smit-1103/CarRentalPriceAnalysis.git
 
-## Check out the Application in action:
+## Check out the output:
 
 
 https://github.com/user-attachments/assets/4ac62e0f-30ec-449a-9be5-2636828488e7
